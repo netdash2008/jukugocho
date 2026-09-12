@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英熟語 単語帳 — 共通テスト対策</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F7F3E9;
+    --paper-line: rgba(35,42,59,0.07);
+    --card: #FFFDF7;
+    --card-border: #E1D8C1;
+    --ink: #232A3B;
+    --ink-soft: #6B6455;
+    --red: #B23B2E;
+    --red-soft: #E8C9C2;
+    --green: #2F7A4F;
+    --green-soft: #CFE3D4;
+    --gold: #A9822F;
+    --v-verb: #2F5D8A;
+    --v-be: #7A4FA0;
+    --v-conj: #B23B2E;
+    --v-adv: #2F7A4F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 28px,
+      linear-gradient(90deg, var(--paper-line) 1px, transparent 1px) 0 0/28px 100%,
+      var(--paper);
+    font-family:'Noto Sans JP', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+
+  /* header */
+  .masthead{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:10px;
+    margin-bottom:18px;
+  }
+  .masthead h1{
+    font-family:'Noto Serif JP', serif;
+    font-weight:700;
+    font-size:22px;
+    margin:0;
+    letter-spacing:.02em;
+  }
+  .masthead .sub{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    font-family:'Noto Serif JP', serif;
+  }
+
+  /* tabs styled like page bookmark tabs */
+  .tabs{display:flex; gap:6px; margin-bottom:18px;}
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:10px 8px 9px;
+    font-family:'Noto Serif JP', serif;
+    font-size:14.5px;
+    font-weight:500;
+    color:var(--ink-soft);
+    background:transparent;
+    border:1px solid var(--card-border);
+    border-bottom:none;
+    border-radius:8px 8px 0 0;
+    cursor:pointer;
+    position:relative;
+    top:1px;
+  }
+  .tab.active{
+    color:var(--ink);
+    background:var(--card);
+    border-color:var(--ink);
+    font-weight:700;
+  }
+  .panel{
+    background:var(--card);
+    border:1px solid var(--ink);
+    border-radius:0 8px 8px 8px;
+    padding:26px 22px 22px;
+    position:relative;
+  }
+  .levelbar{
+    display:flex;
+    gap:7px;
+    margin-bottom:14px;
+    overflow-x:auto;
+    padding-bottom:2px;
+  }
+  .lv-btn{
+    flex:0 0 auto;
+    padding:7px 13px;
+    border-radius:999px;
+    border:1px solid var(--card-border);
+    background:var(--card);
+    font-family:'Noto Serif JP', serif;
+    font-size:12.5px;
+    font-weight:500;
+    color:var(--ink-soft);
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .lv-btn .n{ font-family:'Source Serif 4', serif; font-weight:700; margin-right:3px; }
+  .lv-btn.active{
+    border-color:var(--red);
+    color:var(--red);
+    background:var(--red-soft);
+    font-weight:700;
+  }
+  /* ring holes evoking a binder card */
+  .panel::before{
+    content:"";
+    position:absolute;
+    left:-9px; top:26px; bottom:26px; width:16px;
+    background-image: radial-gradient(circle, var(--paper) 4px, transparent 4.5px);
+    background-size: 16px 34px;
+    background-repeat: repeat-y;
+    border-radius:8px;
+    display:none;
+  }
+  @media(min-width:560px){ .panel::before{display:block;} }
+
+  /* progress footer, page-number style */
+  .pagefoot{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:14px;
+    font-family:'Noto Serif JP', serif;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .pagefoot .count{ letter-spacing:.05em; }
+
+  /* category dot legend */
+  .legend{ display:flex; gap:14px; flex-wrap:wrap; margin:14px 2px 0; font-size:11px; color:var(--ink-soft); }
+  .legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+
+  /* --- FLASHCARD MODE --- */
+  .fc-scene{ perspective:1400px; margin:6px 0 20px; }
+  .fc-card{
+    height:300px;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:transform .5s cubic-bezier(.2,.8,.2,1);
+    cursor:pointer;
+  }
+  .fc-card.flipped{ transform:rotateY(180deg); }
+  .fc-face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    border:1px solid var(--card-border);
+    border-radius:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:20px;
+    background:
+      linear-gradient(var(--paper-line) 1px, transparent 1px) 0 0/100% 24px,
+      #FFFDF9;
+  }
+  .fc-face.back{ transform:rotateY(180deg); }
+  .cat-tag{
+    position:absolute; top:12px; left:14px;
+    font-size:10.5px; color:var(--ink-soft);
+    display:flex; align-items:center; gap:5px;
+    font-family:'Noto Serif JP', serif;
+  }
+  .fc-en{
+    font-family:'Source Serif 4', serif;
+    font-weight:700;
+    font-size:26px;
+    color:var(--ink);
+    line-height:1.3;
+  }
+  .fc-ex-front{
+    margin-top:14px;
+    font-size:13px;
+    font-style:italic;
+    color:var(--ink-soft);
+    font-family:'Source Serif 4', serif;
+    line-height:1.6;
+    max-width:88%;
+  }
+  .fc-hint{
+    margin-top:14px; font-size:11.5px; color:var(--ink-soft);
+    font-family:'Noto Serif JP', serif;
+  }
+  .fc-ja{
+    font-family:'Noto Serif JP', serif;
+    font-size:22px;
+    font-weight:700;
+    color:var(--red);
+  }
+  .fc-ex{
+    margin-top:14px;
+    font-size:13px;
+    font-style:italic;
+    color:var(--ink);
+    font-family:'Source Serif 4', serif;
+    line-height:1.6;
+    max-width:90%;
+  }
+  .fc-exja{
+    margin-top:6px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-family:'Noto Serif JP', serif;
+    line-height:1.6;
+    max-width:90%;
+  }
+
+  .fc-controls{
+    display:flex; gap:10px;
+  }
+  .btn{
+    flex:1;
+    padding:12px 10px;
+    border-radius:7px;
+    border:1px solid var(--ink);
+    background:var(--card);
+    font-family:'Noto Sans JP', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    color:var(--ink);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn.again{ border-color:var(--red); color:var(--red); }
+  .btn.again:hover{ background:var(--red-soft); }
+  .btn.known{ border-color:var(--green); color:var(--green); }
+  .btn.known:hover{ background:var(--green-soft); }
+  .btn.wide{ flex:none; width:100%; margin-top:12px; background:var(--ink); color:var(--paper); }
+
+  .fc-stats{
+    display:flex; gap:16px; margin-top:16px; font-size:12px; color:var(--ink-soft);
+    font-family:'Noto Serif JP', serif;
+    justify-content:center;
+  }
+  .fc-stats b{ color:var(--ink); }
+
+  /* --- QUIZ MODE --- */
+  .q-en{
+    font-family:'Source Serif 4', serif;
+    font-weight:700;
+    font-size:26px;
+    text-align:center;
+    padding:20px 10px 22px;
+    border-bottom:1px dashed var(--card-border);
+    margin-bottom:16px;
+  }
+  .q-ex{
+    text-align:center;
+    font-size:14.5px;
+    color:var(--ink);
+    font-family:'Source Serif 4', serif;
+    font-style:italic;
+    line-height:1.6;
+    padding:0 6px;
+    margin-bottom:10px;
+  }
+  .q-ex strong{
+    font-style:normal;
+    border-bottom:2px solid var(--red);
+    color:var(--red);
+  }
+  .q-prompt{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:0;
+    margin-bottom:16px;
+    font-family:'Noto Serif JP', serif;
+  }
+  .choices{ display:flex; flex-direction:column; gap:9px; }
+  .choice{
+    text-align:left;
+    padding:12px 14px;
+    border:1px solid var(--card-border);
+    border-radius:7px;
+    background:#FFFDF9;
+    font-family:'Noto Serif JP', serif;
+    font-size:14.5px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--ink);
+  }
+  .choice .k{
+    font-family:'Source Serif 4', serif;
+    font-weight:700;
+    color:var(--ink-soft);
+    font-size:12px;
+    width:16px;
+  }
+  .choice.correct{ border-color:var(--green); background:var(--green-soft); }
+  .choice.wrong{ border-color:var(--red); background:var(--red-soft); }
+  .choice[disabled]{ cursor:default; }
+
+  .q-feedback{
+    min-height:20px;
+    margin-top:12px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    text-align:center;
+    font-family:'Noto Serif JP', serif;
+  }
+  .q-feedback b{ color:var(--red); }
+
+  .score-strip{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Noto Serif JP', serif; font-size:12px; color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .score-strip b{ color:var(--ink); }
+
+  .done{
+    text-align:center; padding:30px 10px;
+  }
+  .done .big{
+    font-family:'Noto Serif JP', serif;
+    font-size:34px;
+    font-weight:700;
+    color:var(--red);
+    margin-bottom:4px;
+  }
+  .done .sub{ color:var(--ink-soft); font-size:13px; margin-bottom:18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div>
+      <h1>英熟語 単語帳</h1>
+      <div class="sub">共通テスト対策・頻出65熟語</div>
+    </div>
+    <div class="sub" id="dateTag"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabFc">フラッシュカード</button>
+    <button class="tab" id="tabQz">確認テスト</button>
+  </div>
+
+  <div class="levelbar" id="levelbar"></div>
+
+  <div class="panel" id="panel"></div>
+
+  <div class="legend">
+    <span><i class="dot" style="background:var(--v-verb)"></i>動詞句</span>
+    <span><i class="dot" style="background:var(--v-be)"></i>be動詞句</span>
+    <span><i class="dot" style="background:var(--v-conj)"></i>接続表現</span>
+    <span><i class="dot" style="background:var(--v-adv)"></i>副詞句</span>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  {en:"get along with", ja:"〜とうまくやっていく", ex:"I get along with my classmates.", t:"verb", l:1, exja:"私はクラスメートとうまくやっている。"},
+  {en:"look forward to", ja:"〜を楽しみにする", ex:"I'm looking forward to the trip.", t:"verb", l:1, exja:"私はその旅行を楽しみにしている。"},
+  {en:"take care of", ja:"〜の世話をする", ex:"She takes care of her little brother.", t:"verb", l:1, exja:"彼女は弟の世話をしている。"},
+  {en:"make up for", ja:"〜を埋め合わせる", ex:"He worked hard to make up for lost time.", t:"verb", l:1, exja:"彼は失った時間を埋め合わせるために懸命に働いた。"},
+  {en:"put off", ja:"〜を延期する", ex:"Let's put off the meeting until Friday.", t:"verb", l:1, exja:"会議を金曜日まで延期しよう。"},
+  {en:"give up", ja:"〜をあきらめる", ex:"Never give up on your dream.", t:"verb", l:1, exja:"夢をあきらめるな。"},
+  {en:"run out of", ja:"〜を使い果たす", ex:"We ran out of time.", t:"verb", l:1, exja:"私たちは時間を使い果たした。"},
+  {en:"take part in", ja:"〜に参加する", ex:"Many students took part in the event.", t:"verb", l:1, exja:"多くの生徒がそのイベントに参加した。"},
+  {en:"come up with", ja:"〜を思いつく", ex:"She came up with a great idea.", t:"verb", l:1, exja:"彼女は素晴らしい考えを思いついた。"},
+  {en:"depend on", ja:"〜次第である／〜に頼る", ex:"It depends on the weather.", t:"verb", l:1, exja:"それは天気次第だ。"},
+  {en:"focus on", ja:"〜に集中する", ex:"Please focus on your studies.", t:"verb", l:1, exja:"勉強に集中してください。"},
+  {en:"deal with", ja:"〜に対処する", ex:"We need to deal with this problem.", t:"verb", l:1, exja:"私たちはこの問題に対処する必要がある。"},
+  {en:"consist of", ja:"〜から成る", ex:"The team consists of ten members.", t:"verb", l:1, exja:"そのチームは10人のメンバーから成る。"},
+  {en:"result in", ja:"〜という結果になる", ex:"The accident resulted in serious damage.", t:"verb", l:1, exja:"その事故は深刻な被害という結果になった。"},
+  {en:"lead to", ja:"〜につながる", ex:"Hard work leads to success.", t:"verb", l:1, exja:"努力は成功につながる。"},
+  {en:"turn out", ja:"〜だと分かる", ex:"It turned out that he was right.", t:"verb", l:1, exja:"結局、彼が正しかったことが分かった。"},
+  {en:"figure out", ja:"〜を理解する", ex:"I can't figure out the answer.", t:"verb", l:1, exja:"私はその答えが分からない。"},
+  {en:"keep up with", ja:"〜に遅れずについていく", ex:"It's hard to keep up with the news.", t:"verb", l:1, exja:"ニュースに遅れずについていくのは難しい。"},
+  {en:"catch up with", ja:"〜に追いつく", ex:"He ran to catch up with his friends.", t:"verb", l:1, exja:"彼は友達に追いつくために走った。"},
+  {en:"get rid of", ja:"〜を取り除く", ex:"We need to get rid of the old furniture.", t:"verb", l:1, exja:"私たちは古い家具を処分する必要がある。"},
+  {en:"pay attention to", ja:"〜に注意を払う", ex:"Pay attention to the teacher.", t:"verb", l:1, exja:"先生に注意を払いなさい。"},
+
+  {en:"be based on", ja:"〜に基づいている", ex:"The movie is based on a true story.", t:"be", l:1, exja:"その映画は実話に基づいている。"},
+  {en:"be different from", ja:"〜と異なる", ex:"This is different from what I expected.", t:"be", l:1, exja:"これは私が期待していたものと異なる。"},
+  {en:"be famous for", ja:"〜で有名である", ex:"Kyoto is famous for its temples.", t:"be", l:1, exja:"京都はお寺で有名だ。"},
+  {en:"be filled with", ja:"〜でいっぱいである", ex:"Her eyes were filled with tears.", t:"be", l:1, exja:"彼女の目は涙でいっぱいだった。"},
+  {en:"be interested in", ja:"〜に興味がある", ex:"I'm interested in science.", t:"be", l:1, exja:"私は科学に興味がある。"},
+  {en:"be made of", ja:"〜でできている（材質そのまま）", ex:"This table is made of wood.", t:"be", l:1, exja:"このテーブルは木でできている。"},
+  {en:"be made from", ja:"〜から作られる（性質が変化）", ex:"Wine is made from grapes.", t:"be", l:1, exja:"ワインはブドウから作られる。"},
+  {en:"be proud of", ja:"〜を誇りに思う", ex:"I'm proud of your effort.", t:"be", l:1, exja:"私はあなたの努力を誇りに思う。"},
+  {en:"be responsible for", ja:"〜に責任がある", ex:"He is responsible for the project.", t:"be", l:1, exja:"彼はそのプロジェクトに責任がある。"},
+  {en:"be satisfied with", ja:"〜に満足している", ex:"We are satisfied with the result.", t:"be", l:1, exja:"私たちはその結果に満足している。"},
+  {en:"be similar to", ja:"〜に似ている", ex:"This song is similar to that one.", t:"be", l:1, exja:"この曲はあの曲に似ている。"},
+  {en:"be sure of", ja:"〜を確信している", ex:"I'm sure of my decision.", t:"be", l:1, exja:"私は自分の決断を確信している。"},
+  {en:"be surprised at", ja:"〜に驚く", ex:"She was surprised at the news.", t:"be", l:1, exja:"彼女はその知らせに驚いた。"},
+  {en:"be used to", ja:"〜に慣れている", ex:"I'm used to getting up early.", t:"be", l:1, exja:"私は早起きに慣れている。"},
+  {en:"be aware of", ja:"〜に気づいている", ex:"Are you aware of the risk?", t:"be", l:1, exja:"あなたはその危険に気づいていますか。"},
+  {en:"be about to", ja:"まさに〜しようとしている", ex:"The train is about to leave.", t:"be", l:1, exja:"その電車はまさに出発しようとしている。"},
+
+  {en:"as soon as", ja:"〜するとすぐに", ex:"Call me as soon as you arrive.", t:"conj", l:1, exja:"到着したらすぐに私に電話してください。"},
+  {en:"because of", ja:"〜のせいで／〜のために", ex:"The game was cancelled because of rain.", t:"conj", l:1, exja:"試合は雨のために中止になった。"},
+  {en:"by the time", ja:"〜するまでに", ex:"By the time I arrived, the show had started.", t:"conj", l:1, exja:"私が到着するまでに、ショーは始まっていた。"},
+  {en:"in order to", ja:"〜するために", ex:"She studied hard in order to pass.", t:"conj", l:1, exja:"彼女は合格するために懸命に勉強した。"},
+  {en:"in spite of", ja:"〜にもかかわらず", ex:"He went out in spite of the storm.", t:"conj", l:1, exja:"彼は嵐にもかかわらず外出した。"},
+  {en:"instead of", ja:"〜の代わりに", ex:"Use a bike instead of a car.", t:"conj", l:1, exja:"車の代わりに自転車を使いなさい。"},
+  {en:"on the other hand", ja:"一方で", ex:"On the other hand, prices are rising.", t:"conj", l:1, exja:"一方で、物価は上昇している。"},
+  {en:"so that", ja:"〜するために", ex:"Speak loudly so that everyone can hear.", t:"conj", l:1, exja:"みんなに聞こえるように大きな声で話しなさい。"},
+  {en:"such as", ja:"例えば〜のような", ex:"Fruits such as apples and oranges.", t:"conj", l:1, exja:"リンゴやオレンジのような果物。"},
+  {en:"as long as", ja:"〜する限り", ex:"You can stay as long as you like.", t:"conj", l:1, exja:"あなたが望む限り滞在してもよい。"},
+  {en:"as far as", ja:"〜する限り（範囲）", ex:"As far as I know, it's true.", t:"conj", l:1, exja:"私の知る限り、それは本当だ。"},
+  {en:"even if", ja:"たとえ〜でも", ex:"Even if it rains, we will go.", t:"conj", l:1, exja:"たとえ雨が降っても、私たちは行く。"},
+  {en:"even though", ja:"〜にもかかわらず", ex:"Even though he was tired, he kept working.", t:"conj", l:1, exja:"彼は疲れていたにもかかわらず、働き続けた。"},
+  {en:"now that", ja:"今や〜なので", ex:"Now that you're here, let's start.", t:"conj", l:1, exja:"あなたがここに来た今、始めましょう。"},
+  {en:"not only ... but also", ja:"〜だけでなく…も", ex:"She is not only smart but also kind.", t:"conj", l:1, exja:"彼女は賢いだけでなく親切でもある。"},
+  {en:"as if", ja:"まるで〜のように", ex:"He talks as if he knew everything.", t:"conj", l:1, exja:"彼はまるで何でも知っているかのように話す。"},
+  {en:"provided that", ja:"〜という条件で", ex:"You may go provided that you finish your work.", t:"conj", l:1, exja:"仕事を終えるという条件で、あなたは行ってもよい。"},
+
+  {en:"as a result", ja:"その結果", ex:"As a result, sales increased.", t:"adv", l:1, exja:"その結果、売上が増加した。"},
+  {en:"at first", ja:"最初は", ex:"At first, I didn't understand.", t:"adv", l:1, exja:"最初は、私は理解できなかった。"},
+  {en:"at last", ja:"ついに", ex:"At last, the rain stopped.", t:"adv", l:1, exja:"ついに、雨がやんだ。"},
+  {en:"at least", ja:"少なくとも", ex:"It will take at least an hour.", t:"adv", l:1, exja:"少なくとも1時間はかかるだろう。"},
+  {en:"in addition to", ja:"〜に加えて", ex:"In addition to English, he speaks French.", t:"adv", l:1, exja:"英語に加えて、彼はフランス語も話す。"},
+  {en:"in the end", ja:"結局", ex:"In the end, they agreed.", t:"adv", l:1, exja:"結局、彼らは同意した。"},
+  {en:"all of a sudden", ja:"突然", ex:"All of a sudden, the lights went out.", t:"adv", l:1, exja:"突然、明かりが消えた。"},
+  {en:"in general", ja:"一般に", ex:"In general, prices are lower here.", t:"adv", l:1, exja:"一般に、ここでは物価が安い。"},
+  {en:"in fact", ja:"実際に", ex:"In fact, I've never been there.", t:"adv", l:1, exja:"実際、私はそこに行ったことがない。"},
+  {en:"in other words", ja:"言い換えると", ex:"In other words, we need more time.", t:"adv", l:1, exja:"言い換えると、私たちにはもっと時間が必要だ。"},
+  {en:"for the first time", ja:"初めて", ex:"I saw snow for the first time.", t:"adv", l:1, exja:"私は初めて雪を見た。"},
+  {en:"little by little", ja:"少しずつ", ex:"Little by little, she improved.", t:"adv", l:1, exja:"少しずつ、彼女は上達した。"},
+  {en:"sooner or later", ja:"遅かれ早かれ", ex:"Sooner or later, you'll understand.", t:"adv", l:1, exja:"遅かれ早かれ、あなたは理解するだろう。"},
+  {en:"at the same time", ja:"同時に", ex:"They arrived at the same time.", t:"adv", l:1, exja:"彼らは同時に到着した。"},
+  {en:"no longer", ja:"もはや〜ない", ex:"He is no longer a student.", t:"adv", l:1, exja:"彼はもはや学生ではない。"},
+
+  // ---- Level 2: 標準 ----
+  {en:"in front of", ja:"〜の前に", ex:"She was standing in front of the door.", t:"adv", l:2, exja:"彼女はドアの前に立っていた。"},
+  {en:"next to", ja:"〜の隣に", ex:"Sit next to me, please.", t:"adv", l:2, exja:"私の隣に座ってください。"},
+  {en:"as well as", ja:"〜と同様に", ex:"She can sing as well as dance.", t:"conj", l:2, exja:"彼女は踊れるだけでなく歌うこともできる。"},
+  {en:"apart from", ja:"〜は別として", ex:"Apart from the cost, it's a good plan.", t:"adv", l:2, exja:"費用を別にすれば、それは良い計画だ。"},
+  {en:"according to", ja:"〜によれば", ex:"According to the news, it will rain tomorrow.", t:"adv", l:2, exja:"ニュースによれば、明日は雨が降る。"},
+  {en:"thanks to", ja:"〜のおかげで", ex:"Thanks to your help, we finished early.", t:"adv", l:2, exja:"あなたの助けのおかげで、私たちは早く終わった。"},
+  {en:"due to", ja:"〜が原因で", ex:"The delay was due to heavy traffic.", t:"adv", l:2, exja:"遅れは渋滞が原因だった。"},
+  {en:"regardless of", ja:"〜に関係なく", ex:"Regardless of the weather, we will go.", t:"adv", l:2, exja:"天気に関係なく、私たちは行く。"},
+  {en:"as a whole", ja:"全体として", ex:"As a whole, the plan worked well.", t:"adv", l:2, exja:"全体として、その計画はうまくいった。"},
+  {en:"for the sake of", ja:"〜のために", ex:"He did it for the sake of his family.", t:"adv", l:2, exja:"彼は家族のためにそれをした。"},
+  {en:"in favor of", ja:"〜に賛成して", ex:"Most people voted in favor of the plan.", t:"adv", l:2, exja:"ほとんどの人がその計画に賛成票を投じた。"},
+  {en:"on behalf of", ja:"〜を代表して", ex:"I'm speaking on behalf of the team.", t:"adv", l:2, exja:"私はチームを代表して話しています。"},
+  {en:"in terms of", ja:"〜の点で", ex:"In terms of cost, this is better.", t:"adv", l:2, exja:"費用の点では、こちらの方が良い。"},
+  {en:"with regard to", ja:"〜に関して", ex:"With regard to your question, let me explain.", t:"adv", l:2, exja:"あなたの質問に関して、説明させてください。"},
+  {en:"in relation to", ja:"〜に関連して", ex:"This is discussed in relation to the report.", t:"adv", l:2, exja:"これはその報告書に関連して議論されている。"},
+  {en:"as opposed to", ja:"〜とは対照的に", ex:"He prefers tea as opposed to coffee.", t:"adv", l:2, exja:"彼はコーヒーとは対照的に紅茶を好む。"},
+  {en:"in contrast to", ja:"〜とは対照的に", ex:"In contrast to last year, sales rose.", t:"adv", l:2, exja:"昨年とは対照的に、売上が伸びた。"},
+  {en:"compared to", ja:"〜と比べて", ex:"Compared to before, prices are high.", t:"adv", l:2, exja:"以前と比べて、物価が高い。"},
+  {en:"as for", ja:"〜について言えば", ex:"As for me, I agree with you.", t:"adv", l:2, exja:"私について言えば、あなたに賛成だ。"},
+  {en:"when it comes to", ja:"〜のこととなると", ex:"When it comes to cooking, she is excellent.", t:"conj", l:2, exja:"料理のこととなると、彼女は素晴らしい。"},
+  {en:"in case of", ja:"〜の場合には", ex:"In case of emergency, call this number.", t:"adv", l:2, exja:"緊急の場合には、この番号に電話してください。"},
+  {en:"as a rule", ja:"原則として", ex:"As a rule, the shop closes at eight.", t:"adv", l:2, exja:"原則として、その店は8時に閉まる。"},
+  {en:"by nature", ja:"生まれつき", ex:"He is quiet by nature.", t:"adv", l:2, exja:"彼は生まれつき物静かだ。"},
+  {en:"for good", ja:"永久に", ex:"She left the town for good.", t:"adv", l:2, exja:"彼女はその町を永久に去った。"},
+  {en:"in vain", ja:"無駄に", ex:"All our efforts were in vain.", t:"adv", l:2, exja:"私たちの努力はすべて無駄だった。"},
+  {en:"on time", ja:"時間通りに", ex:"The train arrived on time.", t:"adv", l:2, exja:"電車は時間通りに到着した。"},
+  {en:"in time", ja:"間に合って", ex:"We got to the station in time.", t:"adv", l:2, exja:"私たちは間に合って駅に着いた。"},
+  {en:"behind schedule", ja:"予定より遅れて", ex:"The project is behind schedule.", t:"adv", l:2, exja:"そのプロジェクトは予定より遅れている。"},
+  {en:"ahead of schedule", ja:"予定より早く", ex:"We finished ahead of schedule.", t:"adv", l:2, exja:"私たちは予定より早く終えた。"},
+  {en:"in advance", ja:"前もって", ex:"Please book in advance.", t:"adv", l:2, exja:"前もって予約してください。"},
+  {en:"at once", ja:"すぐに", ex:"Come here at once.", t:"adv", l:2, exja:"すぐにここに来なさい。"},
+  {en:"right away", ja:"すぐに", ex:"Come here right away.", t:"adv", l:2, exja:"すぐにここに来なさい。"},
+  {en:"from time to time", ja:"時々", ex:"We meet from time to time.", t:"adv", l:2, exja:"私たちは時々会う。"},
+  {en:"once in a while", ja:"たまに", ex:"He visits once in a while.", t:"adv", l:2, exja:"彼はたまに訪れる。"},
+  {en:"on and on", ja:"延々と", ex:"He talked on and on.", t:"adv", l:2, exja:"彼は延々と話し続けた。"},
+  {en:"over and over", ja:"何度も", ex:"She practiced over and over.", t:"adv", l:2, exja:"彼女は何度も何度も練習した。"},
+  {en:"day by day", ja:"日ごとに", ex:"The weather is getting warmer day by day.", t:"adv", l:2, exja:"天気は日ごとに暖かくなっている。"},
+  {en:"step by step", ja:"一歩ずつ", ex:"Learn step by step.", t:"adv", l:2, exja:"一歩ずつ学びなさい。"},
+  {en:"one by one", ja:"一つずつ", ex:"Check the items one by one.", t:"adv", l:2, exja:"項目を一つずつ確認しなさい。"},
+  {en:"side by side", ja:"並んで", ex:"They walked side by side.", t:"adv", l:2, exja:"彼らは並んで歩いた。"},
+  {en:"hand in hand", ja:"手をつないで／一体となって", ex:"They worked hand in hand.", t:"adv", l:2, exja:"彼らは協力して働いた。"},
+  {en:"face to face", ja:"対面で", ex:"Let's talk face to face.", t:"adv", l:2, exja:"直接会って話しましょう。"},
+  {en:"back and forth", ja:"行ったり来たり", ex:"He walked back and forth.", t:"adv", l:2, exja:"彼は行ったり来たりした。"},
+  {en:"up and down", ja:"上下に", ex:"The boat moved up and down.", t:"adv", l:2, exja:"船は上下に揺れた。"},
+  {en:"in and out", ja:"出たり入ったり", ex:"People went in and out of the shop.", t:"adv", l:2, exja:"人々はその店に出たり入ったりした。"},
+  {en:"on and off", ja:"断続的に", ex:"It rained on and off all day.", t:"adv", l:2, exja:"一日中、雨が降ったりやんだりした。"},
+  {en:"more and more", ja:"ますます", ex:"It's getting more and more difficult.", t:"adv", l:2, exja:"それはますます難しくなっている。"},
+  {en:"less and less", ja:"だんだん少なく", ex:"He talks less and less these days.", t:"adv", l:2, exja:"彼は最近だんだん話さなくなっている。"},
+  {en:"better and better", ja:"だんだん良く", ex:"Her English is getting better and better.", t:"adv", l:2, exja:"彼女の英語はどんどん上達している。"},
+  {en:"worse and worse", ja:"だんだん悪く", ex:"The situation is getting worse and worse.", t:"adv", l:2, exja:"状況はどんどん悪化している。"},
+  {en:"at any rate", ja:"とにかく", ex:"At any rate, we must finish today.", t:"adv", l:2, exja:"とにかく、私たちは今日終わらせなければならない。"},
+  {en:"in any case", ja:"いずれにせよ", ex:"In any case, let's try it.", t:"adv", l:2, exja:"いずれにせよ、やってみよう。"},
+  {en:"after all", ja:"結局", ex:"After all, he decided to stay.", t:"adv", l:2, exja:"結局、彼は残ることにした。"},
+  {en:"in short", ja:"要するに", ex:"In short, the plan failed.", t:"adv", l:2, exja:"要するに、その計画は失敗した。"},
+  {en:"to sum up", ja:"要約すると", ex:"To sum up, we need more time.", t:"adv", l:2, exja:"要約すると、私たちにはもっと時間が必要だ。"},
+  {en:"in brief", ja:"手短に言うと", ex:"In brief, the meeting was useful.", t:"adv", l:2, exja:"手短に言うと、会議は有益だった。"},
+  {en:"on the whole", ja:"概して", ex:"On the whole, the trip was a success.", t:"adv", l:2, exja:"概して、その旅行は成功だった。"},
+  {en:"by and large", ja:"概して", ex:"By and large, people were satisfied.", t:"adv", l:2, exja:"概して、人々は満足していた。"},
+  {en:"more or less", ja:"多かれ少なかれ", ex:"The plan is more or less finished.", t:"adv", l:2, exja:"その計画はほぼ完成している。"},
+  {en:"at best", ja:"せいぜい", ex:"At best, we can finish by Friday.", t:"adv", l:2, exja:"よくても、金曜日までに終わらせられる程度だ。"},
+  {en:"at worst", ja:"最悪の場合", ex:"At worst, we lose a little money.", t:"adv", l:2, exja:"最悪の場合でも、少しのお金を失うだけだ。"},
+  {en:"if any", ja:"もしあれば", ex:"There are few mistakes, if any.", t:"adv", l:2, exja:"間違いは、あるとしてもごくわずかだ。"},
+  {en:"if anything", ja:"どちらかと言えば", ex:"If anything, it's getting colder.", t:"adv", l:2, exja:"どちらかと言えば、寒くなってきている。"},
+  {en:"let alone", ja:"〜は言うまでもなく", ex:"He can't even walk, let alone run.", t:"conj", l:2, exja:"彼は走るどころか歩くことさえできない。"},
+  {en:"much less", ja:"まして〜ない", ex:"I can't cook rice, much less a full meal.", t:"conj", l:2, exja:"私はご飯すら炊けない、ましてやフルコースの食事など作れない。"},
+  {en:"needless to say", ja:"言うまでもなく", ex:"Needless to say, health comes first.", t:"adv", l:2, exja:"言うまでもなく、健康が第一だ。"},
+  {en:"as usual", ja:"いつも通り", ex:"He was late, as usual.", t:"adv", l:2, exja:"彼はいつも通り遅刻した。"},
+  {en:"in person", ja:"直接（本人が）", ex:"Please come in person.", t:"adv", l:2, exja:"直接お越しください。"},
+  {en:"in public", ja:"人前で", ex:"He rarely speaks in public.", t:"adv", l:2, exja:"彼はめったに人前で話さない。"},
+  {en:"in private", ja:"内密に", ex:"They talked in private.", t:"adv", l:2, exja:"彼らは内密に話し合った。"},
+  {en:"on purpose", ja:"わざと", ex:"He broke it on purpose.", t:"adv", l:2, exja:"彼はわざとそれを壊した。"},
+  {en:"by accident", ja:"偶然に", ex:"We met by accident.", t:"adv", l:2, exja:"私たちは偶然出会った。"},
+  {en:"by chance", ja:"偶然", ex:"I found it by chance.", t:"adv", l:2, exja:"私はそれを偶然見つけた。"},
+  {en:"by mistake", ja:"間違って", ex:"I took your umbrella by mistake.", t:"adv", l:2, exja:"私は間違ってあなたの傘を持って行った。"},
+  {en:"in a hurry", ja:"急いで", ex:"She left in a hurry.", t:"adv", l:2, exja:"彼女は急いで出発した。"},
+
+  // ---- Level 3: 応用 ----
+  {en:"take advantage of", ja:"〜を利用する", ex:"He took advantage of the sale.", t:"verb", l:3, exja:"彼はセールを利用した。"},
+  {en:"take into account", ja:"〜を考慮に入れる", ex:"We must take his age into account.", t:"verb", l:3, exja:"私たちは彼の年齢を考慮しなければならない。"},
+  {en:"take place", ja:"起こる、開催される", ex:"The festival takes place every June.", t:"verb", l:3, exja:"その祭りは毎年6月に開催される。"},
+  {en:"take over", ja:"引き継ぐ", ex:"She will take over the company.", t:"verb", l:3, exja:"彼女はその会社を引き継ぐだろう。"},
+  {en:"take off", ja:"離陸する／脱ぐ", ex:"The plane took off on time.", t:"verb", l:3, exja:"飛行機は時間通りに離陸した。"},
+  {en:"take on", ja:"引き受ける", ex:"He took on extra work.", t:"verb", l:3, exja:"彼は追加の仕事を引き受けた。"},
+  {en:"take up", ja:"始める、占める", ex:"She took up painting last year.", t:"verb", l:3, exja:"彼女は昨年、絵を始めた。"},
+  {en:"set up", ja:"設立する、準備する", ex:"They set up a new company.", t:"verb", l:3, exja:"彼らは新しい会社を設立した。"},
+  {en:"set off", ja:"出発する", ex:"We set off early in the morning.", t:"verb", l:3, exja:"私たちは早朝に出発した。"},
+  {en:"set aside", ja:"取っておく", ex:"Please set aside some time for me.", t:"verb", l:3, exja:"私のために少し時間を取っておいてください。"},
+  {en:"bring about", ja:"〜を引き起こす", ex:"The policy brought about big changes.", t:"verb", l:3, exja:"その政策は大きな変化をもたらした。"},
+  {en:"bring up", ja:"育てる、話題に出す", ex:"She was brought up in Osaka.", t:"verb", l:3, exja:"彼女は大阪で育てられた。"},
+  {en:"carry out", ja:"実行する", ex:"They carried out the plan.", t:"verb", l:3, exja:"彼らはその計画を実行した。"},
+  {en:"carry on", ja:"続ける", ex:"Please carry on with your work.", t:"verb", l:3, exja:"仕事を続けてください。"},
+  {en:"put up with", ja:"〜を我慢する", ex:"I can't put up with the noise.", t:"verb", l:3, exja:"私はその騒音に我慢できない。"},
+  {en:"put together", ja:"まとめる、組み立てる", ex:"We put the report together.", t:"verb", l:3, exja:"私たちは報告書をまとめた。"},
+  {en:"hand in", ja:"提出する", ex:"Hand in your homework by Friday.", t:"verb", l:3, exja:"金曜日までに宿題を提出しなさい。"},
+  {en:"hand out", ja:"配る", ex:"The teacher handed out the papers.", t:"verb", l:3, exja:"先生はプリントを配った。"},
+  {en:"turn down", ja:"断る", ex:"He turned down the offer.", t:"verb", l:3, exja:"彼はその申し出を断った。"},
+  {en:"turn into", ja:"〜に変わる", ex:"The rain turned into snow.", t:"verb", l:3, exja:"雨は雪に変わった。"},
+  {en:"turn up", ja:"現れる、音量を上げる", ex:"He didn't turn up for the meeting.", t:"verb", l:3, exja:"彼は会議に現れなかった。"},
+  {en:"show up", ja:"現れる", ex:"She showed up late.", t:"verb", l:3, exja:"彼女は遅れて現れた。"},
+  {en:"break down", ja:"故障する、崩れる", ex:"The car broke down on the way.", t:"verb", l:3, exja:"車は途中で故障した。"},
+  {en:"break out", ja:"発生する", ex:"A fire broke out last night.", t:"verb", l:3, exja:"昨夜、火事が発生した。"},
+  {en:"break up", ja:"別れる、解散する", ex:"They broke up after college.", t:"verb", l:3, exja:"彼らは大学卒業後に別れた。"},
+  {en:"call off", ja:"中止する", ex:"The game was called off due to rain.", t:"verb", l:3, exja:"試合は雨のため中止になった。"},
+  {en:"call for", ja:"〜を必要とする、求める", ex:"The situation calls for quick action.", t:"verb", l:3, exja:"その状況は迅速な対応を必要としている。"},
+  {en:"come across", ja:"偶然出会う", ex:"I came across an old friend.", t:"verb", l:3, exja:"私は偶然、旧友に出会った。"},
+  {en:"come along", ja:"一緒に来る、進む", ex:"The project is coming along well.", t:"verb", l:3, exja:"そのプロジェクトは順調に進んでいる。"},
+  {en:"come into effect", ja:"施行される", ex:"The new law comes into effect next month.", t:"verb", l:3, exja:"新しい法律は来月施行される。"},
+  {en:"count on", ja:"頼りにする", ex:"You can count on me.", t:"verb", l:3, exja:"私を頼りにしていいですよ。"},
+  {en:"rely on", ja:"頼る", ex:"We rely on renewable energy.", t:"verb", l:3, exja:"私たちは再生可能エネルギーに頼っている。"},
+  {en:"stand for", ja:"〜を表す", ex:"What does UN stand for?", t:"verb", l:3, exja:"UNは何を表しているのですか。"},
+  {en:"stand out", ja:"目立つ", ex:"Her work really stands out.", t:"verb", l:3, exja:"彼女の作品は本当に目立つ。"},
+  {en:"stick to", ja:"〜を守る、固執する", ex:"Let's stick to the plan.", t:"verb", l:3, exja:"計画通りにしましょう。"},
+  {en:"hold on to", ja:"〜をしっかり持つ、保持する", ex:"Hold on to the railing.", t:"verb", l:3, exja:"手すりにしっかりつかまってください。"},
+  {en:"look into", ja:"調べる", ex:"The police are looking into the case.", t:"verb", l:3, exja:"警察はその事件を調べている。"},
+  {en:"look down on", ja:"〜を見下す", ex:"Don't look down on others.", t:"verb", l:3, exja:"他人を見下してはいけない。"},
+  {en:"look up to", ja:"〜を尊敬する", ex:"Students look up to their teacher.", t:"verb", l:3, exja:"生徒たちは先生を尊敬している。"},
+  {en:"look after", ja:"世話をする", ex:"She looks after her grandmother.", t:"verb", l:3, exja:"彼女は祖母の世話をしている。"},
+  {en:"watch out for", ja:"〜に気をつける", ex:"Watch out for cars.", t:"verb", l:3, exja:"車に気をつけなさい。"},
+  {en:"make sure", ja:"確かめる", ex:"Make sure you lock the door.", t:"verb", l:3, exja:"必ずドアに鍵をかけなさい。"},
+  {en:"make the most of", ja:"〜を最大限に活用する", ex:"Make the most of your time.", t:"verb", l:3, exja:"時間を最大限に活用しなさい。"},
+  {en:"make it a rule to", ja:"〜することにしている", ex:"I make it a rule to walk every day.", t:"verb", l:3, exja:"私は毎日歩くことにしている。"},
+  {en:"do without", ja:"〜なしで済ます", ex:"We can't do without water.", t:"verb", l:3, exja:"私たちは水なしでは済ませられない。"},
+  {en:"go through", ja:"経験する、通り抜ける", ex:"She went through a difficult time.", t:"verb", l:3, exja:"彼女は困難な時期を経験した。"},
+  {en:"go over", ja:"見直す", ex:"Let's go over the plan again.", t:"verb", l:3, exja:"もう一度計画を見直しましょう。"},
+  {en:"go on", ja:"続く、起こる", ex:"What's going on here?", t:"verb", l:3, exja:"ここで何が起こっているのですか。"},
+  {en:"get across", ja:"理解させる", ex:"He couldn't get his point across.", t:"verb", l:3, exja:"彼は自分の考えを分かってもらえなかった。"},
+  {en:"get through", ja:"乗り切る、終える", ex:"We got through the exam.", t:"verb", l:3, exja:"私たちは試験を乗り切った。"},
+  {en:"get by", ja:"なんとかやっていく", ex:"We can get by on a small budget.", t:"verb", l:3, exja:"私たちは少ない予算でなんとかやっていける。"},
+  {en:"get down to", ja:"本腰を入れる", ex:"Let's get down to business.", t:"verb", l:3, exja:"本題に取りかかりましょう。"},
+  {en:"get in touch with", ja:"〜と連絡を取る", ex:"Please get in touch with me.", t:"verb", l:3, exja:"私に連絡を取ってください。"},
+  {en:"keep in touch with", ja:"〜と連絡を取り続ける", ex:"Let's keep in touch.", t:"verb", l:3, exja:"連絡を取り合いましょう。"},
+  {en:"keep an eye on", ja:"〜を見張る", ex:"Please keep an eye on the baby.", t:"verb", l:3, exja:"赤ちゃんを見ていてください。"},
+  {en:"keep track of", ja:"〜を記録する、把握する", ex:"It's hard to keep track of all the changes.", t:"verb", l:3, exja:"すべての変更を把握しておくのは難しい。"},
+  {en:"keep in mind", ja:"心に留めておく", ex:"Keep in mind that the shop closes early.", t:"verb", l:3, exja:"その店が早く閉まることを心に留めておきなさい。"},
+  {en:"bear in mind", ja:"心に留める", ex:"Bear in mind the risks.", t:"verb", l:3, exja:"危険性を心に留めておきなさい。"},
+  {en:"lose track of", ja:"〜を見失う", ex:"I lost track of time.", t:"verb", l:3, exja:"私は時間を忘れてしまった。"},
+  {en:"run into", ja:"偶然出会う、遭遇する", ex:"I ran into my teacher at the station.", t:"verb", l:3, exja:"私は駅で先生に偶然会った。"},
+  {en:"run short of", ja:"〜が不足する", ex:"We are running short of money.", t:"verb", l:3, exja:"私たちはお金が不足してきている。"},
+  {en:"fall behind", ja:"遅れる", ex:"He fell behind in his studies.", t:"verb", l:3, exja:"彼は勉強で遅れをとった。"},
+  {en:"fall short of", ja:"〜に達しない", ex:"The result fell short of expectations.", t:"verb", l:3, exja:"結果は期待に届かなかった。"},
+  {en:"live up to", ja:"〜に応える", ex:"He lived up to our expectations.", t:"verb", l:3, exja:"彼は私たちの期待に応えた。"},
+  {en:"add up to", ja:"合計〜になる", ex:"The costs add up to a large amount.", t:"verb", l:3, exja:"費用は合計すると大きな額になる。"},
+  {en:"account for", ja:"〜を説明する、占める", ex:"Tourism accounts for a large part of the economy.", t:"verb", l:3, exja:"観光業は経済の大部分を占めている。"},
+  {en:"contribute to", ja:"〜に貢献する、寄与する", ex:"Exercise contributes to good health.", t:"verb", l:3, exja:"運動は健康増進に貢献する。"},
+  {en:"amount to", ja:"総計〜になる、〜に等しい", ex:"His savings amount to a million yen.", t:"verb", l:3, exja:"彼の貯金は合計100万円になる。"},
+  {en:"refer to", ja:"〜に言及する、参照する", ex:"She referred to her notes.", t:"verb", l:3, exja:"彼女は自分のメモを参照した。"},
+  {en:"relate to", ja:"〜に関連する、理解し共感する", ex:"I can relate to your feelings.", t:"verb", l:3, exja:"私はあなたの気持ちが理解できる。"},
+  {en:"correspond to", ja:"〜に一致する、相当する", ex:"This number corresponds to your seat.", t:"verb", l:3, exja:"この番号があなたの座席に相当します。"},
+  {en:"respond to", ja:"〜に反応する、応じる", ex:"Please respond to the email soon.", t:"verb", l:3, exja:"すぐにそのメールに返信してください。"},
+  {en:"react to", ja:"〜に反応する", ex:"She reacted to the news calmly.", t:"verb", l:3, exja:"彼女はその知らせに冷静に反応した。"},
+  {en:"adapt to", ja:"〜に適応する", ex:"Animals adapt to their environment.", t:"verb", l:3, exja:"動物は環境に適応する。"},
+  {en:"adjust to", ja:"〜に慣れる、順応する", ex:"It took time to adjust to the new school.", t:"verb", l:3, exja:"新しい学校に慣れるのに時間がかかった。"},
+
+  // ---- Level 4: 発展 ----
+  {en:"in the face of", ja:"〜に直面して", ex:"They remained calm in the face of danger.", t:"adv", l:4, exja:"彼らは危険に直面しても冷静さを保った。"},
+  {en:"in the light of", ja:"〜を考慮して", ex:"In the light of new evidence, the plan changed.", t:"adv", l:4, exja:"新たな証拠を考慮して、計画は変更された。"},
+  {en:"in view of", ja:"〜を考慮すると", ex:"In view of the weather, the trip was postponed.", t:"adv", l:4, exja:"天気を考慮して、旅行は延期された。"},
+  {en:"on the grounds that", ja:"〜という理由で", ex:"He was fired on the grounds that he was late.", t:"conj", l:4, exja:"彼は遅刻したという理由で解雇された。"},
+  {en:"for fear of", ja:"〜を恐れて", ex:"She whispered for fear of being heard.", t:"adv", l:4, exja:"彼女は聞かれることを恐れてささやいた。"},
+  {en:"at the expense of", ja:"〜を犠牲にして", ex:"He succeeded at the expense of his health.", t:"adv", l:4, exja:"彼は健康を犠牲にして成功した。"},
+  {en:"at the mercy of", ja:"〜のなすがままに", ex:"The small boat was at the mercy of the waves.", t:"adv", l:4, exja:"小さな船は波のなすがままだった。"},
+  {en:"in the wake of", ja:"〜の後を追って、〜の結果として", ex:"Prices rose in the wake of the disaster.", t:"adv", l:4, exja:"災害の結果として物価が上昇した。"},
+  {en:"in the course of", ja:"〜の間に", ex:"In the course of the meeting, new ideas came up.", t:"adv", l:4, exja:"会議の間に、新しい案が出てきた。"},
+  {en:"in the process of", ja:"〜の過程で", ex:"We are in the process of building a new office.", t:"adv", l:4, exja:"私たちは新しいオフィスを建設している最中だ。"},
+  {en:"by means of", ja:"〜によって、〜を用いて", ex:"They communicated by means of gestures.", t:"adv", l:4, exja:"彼らは身振りによって意思疎通をした。"},
+  {en:"by virtue of", ja:"〜のおかげで、〜によって", ex:"He got the job by virtue of his experience.", t:"adv", l:4, exja:"彼は経験のおかげでその仕事を得た。"},
+  {en:"in accordance with", ja:"〜に従って", ex:"Act in accordance with the rules.", t:"adv", l:4, exja:"規則に従って行動しなさい。"},
+  {en:"in compliance with", ja:"〜に従って", ex:"The factory operates in compliance with the law.", t:"adv", l:4, exja:"その工場は法律を順守して稼働している。"},
+  {en:"with a view to", ja:"〜する目的で", ex:"He studied hard with a view to passing the exam.", t:"adv", l:4, exja:"彼は試験に合格する目的で懸命に勉強した。"},
+  {en:"for the purpose of", ja:"〜の目的で", ex:"The fund was set up for the purpose of research.", t:"adv", l:4, exja:"その基金は研究を目的として設立された。"},
+  {en:"on the assumption that", ja:"〜という前提で", ex:"We planned it on the assumption that it wouldn't rain.", t:"conj", l:4, exja:"私たちは雨が降らないという前提でそれを計画した。"},
+  {en:"on condition that", ja:"〜という条件で", ex:"You may go on condition that you come back early.", t:"conj", l:4, exja:"早く戻るという条件で行ってもよい。"},
+  {en:"to the extent that", ja:"〜する程度まで", ex:"He changed to the extent that no one recognized him.", t:"conj", l:4, exja:"彼は誰も気づかないほどの程度まで変わった。"},
+  {en:"in so far as", ja:"〜する限りでは", ex:"In so far as I know, the rumor is false.", t:"conj", l:4, exja:"私の知る限りでは、そのうわさは誤りだ。"},
+  {en:"for all", ja:"〜にもかかわらず", ex:"For all his wealth, he is not happy.", t:"conj", l:4, exja:"彼は裕福にもかかわらず幸せではない。"},
+  {en:"with all", ja:"〜にもかかわらず", ex:"With all her faults, she is kind.", t:"conj", l:4, exja:"欠点はあるものの、彼女は親切だ。"},
+  {en:"notwithstanding", ja:"〜にもかかわらず", ex:"Notwithstanding the rain, the match continued.", t:"conj", l:4, exja:"雨にもかかわらず、試合は続いた。"},
+  {en:"albeit", ja:"〜だけれども", ex:"The plan worked, albeit slowly.", t:"conj", l:4, exja:"その計画はゆっくりとではあったがうまくいった。"},
+  {en:"much as", ja:"〜だけれども", ex:"Much as I like him, I can't agree.", t:"conj", l:4, exja:"彼のことは好きだけれど、賛成はできない。"},
+  {en:"granted that", ja:"〜だとしても", ex:"Granted that he is busy, he should call back.", t:"conj", l:4, exja:"彼が忙しいとしても、折り返し電話すべきだ。"},
+  {en:"in that", ja:"〜という点で", ex:"The plan is good in that it saves money.", t:"conj", l:4, exja:"その計画はお金を節約できるという点で良い。"},
+  {en:"seeing that", ja:"〜であるから", ex:"Seeing that it's late, let's go home.", t:"conj", l:4, exja:"もう遅いので、家に帰りましょう。"},
+  {en:"given that", ja:"〜を考えると", ex:"Given that it's raining, we'll stay in.", t:"conj", l:4, exja:"雨が降っていることを考えると、家にいよう。"},
+  {en:"as good as", ja:"ほとんど〜も同然", ex:"The work is as good as finished.", t:"adv", l:4, exja:"その作業はほとんど終わったも同然だ。"},
+  {en:"as it were", ja:"いわば", ex:"He is, as it were, a walking dictionary.", t:"adv", l:4, exja:"彼はいわば歩く辞書だ。"},
+  {en:"so to speak", ja:"いわば", ex:"She is the boss, so to speak.", t:"adv", l:4, exja:"彼女はいわばボスだ。"},
+  {en:"to say the least", ja:"控えめに言っても", ex:"The result was disappointing, to say the least.", t:"adv", l:4, exja:"結果は、控えめに言っても残念なものだった。"},
+  {en:"to make matters worse", ja:"さらに悪いことに", ex:"To make matters worse, it began to rain.", t:"adv", l:4, exja:"さらに悪いことに、雨が降り出した。"},
+  {en:"what is worse", ja:"さらに悪いことに", ex:"What is worse, he lost his wallet.", t:"adv", l:4, exja:"さらに悪いことに、彼は財布を失くした。"},
+  {en:"to be sure", ja:"確かに", ex:"To be sure, he is talented, but he lacks experience.", t:"adv", l:4, exja:"確かに彼は才能があるが、経験が足りない。"},
+  {en:"for that matter", ja:"そのことについて言えば", ex:"I don't like coffee, or tea for that matter.", t:"adv", l:4, exja:"私はコーヒーが好きではないし、そのことを言えば紅茶も好きではない。"},
+  {en:"as a matter of course", ja:"当然のこととして", ex:"Safety checks are done as a matter of course.", t:"adv", l:4, exja:"安全点検は当然のこととして行われる。"},
+  {en:"in the first place", ja:"そもそも、第一に", ex:"Why did you agree in the first place?", t:"adv", l:4, exja:"そもそもなぜあなたは同意したのですか。"},
+  {en:"in the long run", ja:"長い目で見れば", ex:"It will pay off in the long run.", t:"adv", l:4, exja:"それは長い目で見れば報われるだろう。"},
+  {en:"in the short run", ja:"短期的には", ex:"In the short run, costs will rise.", t:"adv", l:4, exja:"短期的には、費用は上昇するだろう。"},
+  {en:"on second thought", ja:"考え直してみると", ex:"On second thought, let's not go today.", t:"adv", l:4, exja:"考え直してみると、今日は行かないでおこう。"},
+  {en:"on the contrary", ja:"それどころか", ex:"He isn't lazy; on the contrary, he works very hard.", t:"adv", l:4, exja:"彼は怠け者ではない。それどころか非常によく働く。"},
+  {en:"quite the opposite", ja:"むしろ逆", ex:"He isn't shy; quite the opposite, he loves speaking.", t:"adv", l:4, exja:"彼は内気ではない。むしろ逆で、話すのが大好きだ。"},
+  {en:"above all", ja:"とりわけ、何よりも", ex:"Above all, stay calm.", t:"adv", l:4, exja:"何よりも、落ち着いていなさい。"},
+  {en:"first and foremost", ja:"まず第一に", ex:"First and foremost, safety matters most.", t:"adv", l:4, exja:"まず第一に、安全が最も重要だ。"},
+  {en:"last but not least", ja:"最後になるが重要な", ex:"Last but not least, thank you all.", t:"adv", l:4, exja:"最後になりますが、皆さんに感謝します。"},
+  {en:"not to mention", ja:"〜は言うまでもなく", ex:"He speaks French, not to mention English.", t:"adv", l:4, exja:"彼は英語は言うまでもなく、フランス語も話す。"},
+  {en:"to name a few", ja:"例をいくつか挙げると", ex:"Many countries, to name a few: Japan, France, Brazil.", t:"adv", l:4, exja:"例をいくつか挙げると、日本、フランス、ブラジルなど多くの国がある。"},
+  {en:"and so on", ja:"〜など", ex:"We sell pens, notebooks, and so on.", t:"adv", l:4, exja:"私たちはペン、ノートなどを売っている。"},
+  {en:"and the like", ja:"〜など", ex:"He collects stamps, coins, and the like.", t:"adv", l:4, exja:"彼は切手やコインなどを集めている。"},
+  {en:"or something", ja:"〜か何か", ex:"Let's get coffee or something.", t:"adv", l:4, exja:"コーヒーか何か飲みに行こう。"},
+  {en:"or so", ja:"〜くらい", ex:"It will take an hour or so.", t:"adv", l:4, exja:"1時間ほどかかるだろう。"},
+  {en:"at most", ja:"せいぜい", ex:"It will cost 500 yen at most.", t:"adv", l:4, exja:"せいぜい500円くらいかかるだろう。"},
+  {en:"no more than", ja:"〜しかない", ex:"She has no more than five dollars.", t:"adv", l:4, exja:"彼女は5ドルしか持っていない。"},
+  {en:"no less than", ja:"〜も", ex:"No less than a thousand people came.", t:"adv", l:4, exja:"1000人もの人が来た。"},
+  {en:"not more than", ja:"〜以下", ex:"It costs not more than ten dollars.", t:"adv", l:4, exja:"それは10ドル以下しかかからない。"},
+  {en:"not less than", ja:"〜以上", ex:"We need not less than ten volunteers.", t:"adv", l:4, exja:"私たちには少なくとも10人のボランティアが必要だ。"},
+  {en:"nothing but", ja:"〜だけ", ex:"He eats nothing but vegetables.", t:"adv", l:4, exja:"彼は野菜しか食べない。"},
+  {en:"anything but", ja:"決して〜ではない", ex:"The test was anything but easy.", t:"adv", l:4, exja:"その試験は決して簡単ではなかった。"},
+  {en:"far from", ja:"決して〜ではない", ex:"The movie was far from boring.", t:"adv", l:4, exja:"その映画は決してつまらなくはなかった。"},
+  {en:"rather than", ja:"〜よりむしろ", ex:"I'd walk rather than drive.", t:"conj", l:4, exja:"私は運転するよりむしろ歩きたい。"},
+  {en:"more than", ja:"単なる〜以上", ex:"She is more than a teacher to me.", t:"adv", l:4, exja:"彼女は私にとって単なる先生以上の存在だ。"},
+  {en:"nothing short of", ja:"まさに〜そのもの", ex:"His success was nothing short of amazing.", t:"adv", l:4, exja:"彼の成功はまさに驚くべきものだった。"},
+  {en:"next to nothing", ja:"ほとんどゼロ", ex:"He paid next to nothing for the old bike.", t:"adv", l:4, exja:"彼はその古い自転車にほとんどお金を払わなかった。"},
+  {en:"all but", ja:"ほとんど", ex:"The project is all but finished.", t:"adv", l:4, exja:"そのプロジェクトはほとんど終わっている。"},
+  {en:"next to impossible", ja:"ほとんど不可能", ex:"It's next to impossible to finish today.", t:"adv", l:4, exja:"今日中に終わらせるのはほとんど不可能だ。"},
+  {en:"by no means", ja:"決して〜ない", ex:"He is by no means rich.", t:"adv", l:4, exja:"彼は決して裕福ではない。"},
+  {en:"in no way", ja:"決して〜ない", ex:"I am in no way responsible.", t:"adv", l:4, exja:"私には全く責任がない。"},
+  {en:"on no account", ja:"決して〜してはいけない", ex:"On no account should you open that door.", t:"adv", l:4, exja:"どんなことがあってもそのドアを開けてはいけない。"},
+  {en:"under no circumstances", ja:"どんな状況でも〜ない", ex:"Under no circumstances will refunds be given.", t:"adv", l:4, exja:"どんな状況でも返金は行われません。"},
+  {en:"at all costs", ja:"何としても", ex:"We must win at all costs.", t:"adv", l:4, exja:"私たちは何としても勝たなければならない。"},
+  {en:"by all means", ja:"ぜひとも", ex:"By all means, come and visit us.", t:"adv", l:4, exja:"ぜひ私たちを訪ねてきてください。"},
+  {en:"for nothing", ja:"無駄に、無料で", ex:"All his effort was for nothing.", t:"adv", l:4, exja:"彼の努力はすべて無駄になった。"},
+
+  // ---- Level 5: 最難関 ----
+  {en:"take it for granted that", ja:"〜を当然と思う", ex:"We take it for granted that water is clean.", t:"conj", l:5, exja:"私たちは水がきれいであることを当然だと思っている。"},
+  {en:"it goes without saying that", ja:"〜は言うまでもない", ex:"It goes without saying that health is important.", t:"conj", l:5, exja:"健康が大切なのは言うまでもない。"},
+  {en:"there is no doubt that", ja:"〜は疑いない", ex:"There is no doubt that he is talented.", t:"conj", l:5, exja:"彼が才能豊かであることは疑いない。"},
+  {en:"there is no denying that", ja:"〜は否定できない", ex:"There is no denying that prices have risen.", t:"conj", l:5, exja:"物価が上昇したことは否定できない。"},
+  {en:"it is no wonder that", ja:"〜は当然だ", ex:"It is no wonder that she is tired.", t:"conj", l:5, exja:"彼女が疲れているのは当然だ。"},
+  {en:"it follows that", ja:"従って〜ということになる", ex:"If A is true, it follows that B is true.", t:"conj", l:5, exja:"Aが真であれば、Bも真であるということになる。"},
+  {en:"it turns out that", ja:"結局〜だとわかる", ex:"It turned out that he was innocent.", t:"conj", l:5, exja:"結局、彼は無実だと分かった。"},
+  {en:"it occurs to me that", ja:"ふと〜と思う", ex:"It occurred to me that I had forgotten my keys.", t:"conj", l:5, exja:"鍵を忘れたことにふと気づいた。"},
+  {en:"it dawned on me that", ja:"〜だと気づいた", ex:"It dawned on me that I was wrong.", t:"conj", l:5, exja:"私は自分が間違っていたことに気づいた。"},
+  {en:"it stands to reason that", ja:"〜は道理にかなっている", ex:"It stands to reason that practice improves skill.", t:"conj", l:5, exja:"練習が技術を向上させるのは道理にかなっている。"},
+  {en:"suffice it to say that", ja:"〜と言えば十分だ", ex:"Suffice it to say that the plan failed.", t:"conj", l:5, exja:"その計画が失敗したと言えば十分だろう。"},
+  {en:"be all set to", ja:"〜する準備ができている", ex:"We are all set to start the project.", t:"be", l:5, exja:"私たちはそのプロジェクトを始める準備が整っている。"},
+  {en:"be bound to", ja:"きっと〜する", ex:"He is bound to succeed.", t:"be", l:5, exja:"彼はきっと成功するだろう。"},
+  {en:"be liable to", ja:"〜しがちである", ex:"Glass is liable to break easily.", t:"be", l:5, exja:"ガラスは割れやすい。"},
+  {en:"be inclined to", ja:"〜する傾向がある", ex:"People are inclined to believe rumors.", t:"be", l:5, exja:"人々はうわさを信じがちだ。"},
+  {en:"be prone to", ja:"〜しやすい", ex:"He is prone to making mistakes.", t:"be", l:5, exja:"彼はミスをしやすい。"},
+  {en:"be subject to", ja:"〜を受けやすい、〜次第である", ex:"Prices are subject to change.", t:"be", l:5, exja:"価格は変更されることがある。"},
+  {en:"be susceptible to", ja:"〜の影響を受けやすい", ex:"Children are susceptible to colds.", t:"be", l:5, exja:"子どもは風邪をひきやすい。"},
+  {en:"be reluctant to", ja:"〜するのに気が進まない", ex:"She was reluctant to answer.", t:"be", l:5, exja:"彼女は答えるのをためらった。"},
+  {en:"be hesitant to", ja:"〜するのをためらう", ex:"He was hesitant to speak up.", t:"be", l:5, exja:"彼は発言するのをためらった。"},
+  {en:"be eager to", ja:"しきりに〜したがる", ex:"They are eager to learn.", t:"be", l:5, exja:"彼らはしきりに学びたがっている。"},
+  {en:"be keen on", ja:"〜に熱心である", ex:"He is keen on collecting stamps.", t:"be", l:5, exja:"彼は切手集めに熱心だ。"},
+  {en:"be obliged to", ja:"〜せざるを得ない、感謝している", ex:"We are obliged to follow the rules.", t:"be", l:5, exja:"私たちは規則に従わざるを得ない。"},
+  {en:"be entitled to", ja:"〜する権利がある", ex:"Every citizen is entitled to vote.", t:"be", l:5, exja:"すべての国民は投票する権利がある。"},
+  {en:"be committed to", ja:"〜に専念している", ex:"The company is committed to quality.", t:"be", l:5, exja:"その会社は品質に力を注いでいる。"},
+  {en:"be devoted to", ja:"〜に打ち込んでいる", ex:"She is devoted to her research.", t:"be", l:5, exja:"彼女は研究に打ち込んでいる。"},
+  {en:"be dedicated to", ja:"〜に捧げられている", ex:"The museum is dedicated to local history.", t:"be", l:5, exja:"その博物館は地元の歴史に捧げられている。"},
+  {en:"be equipped with", ja:"〜を備えている", ex:"The car is equipped with a new safety system.", t:"be", l:5, exja:"その車は新しい安全システムを備えている。"},
+  {en:"be characterized by", ja:"〜によって特徴づけられる", ex:"The region is characterized by heavy rainfall.", t:"be", l:5, exja:"その地域は大雨によって特徴づけられる。"},
+  {en:"be attributed to", ja:"〜のせいだとされる", ex:"The success is attributed to teamwork.", t:"be", l:5, exja:"その成功はチームワークによるものとされている。"},
+  {en:"be derived from", ja:"〜に由来する", ex:"The word is derived from Latin.", t:"be", l:5, exja:"その単語はラテン語に由来する。"},
+  {en:"be rooted in", ja:"〜に根ざしている", ex:"The custom is rooted in ancient tradition.", t:"be", l:5, exja:"その習慣は古代の伝統に根ざしている。"},
+  {en:"be bound up with", ja:"〜と密接に結びついている", ex:"His identity is bound up with his career.", t:"be", l:5, exja:"彼のアイデンティティは彼のキャリアと密接に結びついている。"},
+  {en:"be at odds with", ja:"〜と対立している", ex:"His opinion is at odds with the committee's.", t:"be", l:5, exja:"彼の意見は委員会の意見と対立している。"},
+  {en:"be on a par with", ja:"〜と同等である", ex:"Her skill is on a par with professionals.", t:"be", l:5, exja:"彼女の腕前はプロと同等だ。"},
+  {en:"be in line with", ja:"〜と一致している", ex:"The result is in line with our prediction.", t:"be", l:5, exja:"その結果は私たちの予測と一致している。"},
+  {en:"be at stake", ja:"危険にさらされている", ex:"Millions of jobs are at stake.", t:"be", l:5, exja:"何百万もの雇用が危険にさらされている。"},
+  {en:"be at risk of", ja:"〜の危険にさらされている", ex:"Coastal cities are at risk of flooding.", t:"be", l:5, exja:"沿岸都市は洪水の危険にさらされている。"},
+  {en:"be under way", ja:"進行中である", ex:"Construction is already under way.", t:"be", l:5, exja:"建設はすでに進行中だ。"},
+  {en:"be in progress", ja:"進行中である", ex:"The meeting is in progress.", t:"be", l:5, exja:"会議は進行中だ。"},
+  {en:"be on the rise", ja:"上昇している", ex:"Crime rates are on the rise.", t:"be", l:5, exja:"犯罪率は上昇している。"},
+  {en:"be on the decline", ja:"減少している", ex:"Local shops are on the decline.", t:"be", l:5, exja:"地元の商店は減少している。"},
+  {en:"be on the verge of", ja:"〜する寸前である", ex:"The company was on the verge of bankruptcy.", t:"be", l:5, exja:"その会社は倒産寸前だった。"},
+  {en:"be on the brink of", ja:"〜の瀬戸際にいる", ex:"The talks were on the brink of collapse.", t:"be", l:5, exja:"交渉は決裂の瀬戸際だった。"},
+  {en:"give rise to", ja:"〜を引き起こす", ex:"The policy gave rise to controversy.", t:"verb", l:5, exja:"その政策は論争を引き起こした。"},
+  {en:"pave the way for", ja:"〜への道を開く", ex:"The invention paved the way for modern medicine.", t:"verb", l:5, exja:"その発明は現代医学への道を開いた。"},
+  {en:"give way to", ja:"〜に取って代わられる、屈する", ex:"Old customs gave way to new ones.", t:"verb", l:5, exja:"古い習慣は新しい習慣に取って代わられた。"},
+  {en:"yield to", ja:"〜に屈する", ex:"He refused to yield to pressure.", t:"verb", l:5, exja:"彼は圧力に屈することを拒んだ。"},
+  {en:"succumb to", ja:"〜に屈する、負ける", ex:"She succumbed to the temptation.", t:"verb", l:5, exja:"彼女は誘惑に負けた。"},
+  {en:"cope with", ja:"〜にうまく対処する", ex:"He learned to cope with stress.", t:"verb", l:5, exja:"彼はストレスにうまく対処する方法を学んだ。"},
+  {en:"come to terms with", ja:"〜を受け入れる", ex:"It took years to come to terms with the loss.", t:"verb", l:5, exja:"その喪失を受け入れるのに何年もかかった。"},
+  {en:"grapple with", ja:"〜と取り組む", ex:"Scientists grapple with difficult questions.", t:"verb", l:5, exja:"科学者たちは難しい問題に取り組んでいる。"},
+  {en:"wrestle with", ja:"〜と格闘する", ex:"He wrestled with the decision all night.", t:"verb", l:5, exja:"彼は一晩中その決断と格闘した。"},
+  {en:"embark on", ja:"〜に乗り出す", ex:"She embarked on a new career.", t:"verb", l:5, exja:"彼女は新しいキャリアに乗り出した。"},
+  {en:"set out to", ja:"〜しようと着手する", ex:"They set out to change the system.", t:"verb", l:5, exja:"彼らはその制度を変えようと着手した。"},
+  {en:"resort to", ja:"〜に頼る（最終手段として）", ex:"He resorted to violence.", t:"verb", l:5, exja:"彼は暴力に頼った。"},
+  {en:"turn to", ja:"〜に頼る", ex:"She turned to her friends for help.", t:"verb", l:5, exja:"彼女は助けを求めて友人たちを頼った。"},
+  {en:"draw on", ja:"〜を利用する、頼る", ex:"The writer drew on his own experience.", t:"verb", l:5, exja:"その作家は自身の経験を活かした。"},
+  {en:"capitalize on", ja:"〜を利用する、活用する", ex:"Companies capitalize on new trends.", t:"verb", l:5, exja:"企業は新しい流行を利用する。"},
+  {en:"seize on", ja:"〜に飛びつく", ex:"Critics seized on the mistake.", t:"verb", l:5, exja:"批評家たちはその過ちに飛びついた。"},
+  {en:"dwell on", ja:"〜についてくよくよ考える", ex:"Don't dwell on the past.", t:"verb", l:5, exja:"過去のことをくよくよ考えるな。"},
+  {en:"touch on", ja:"〜に軽く触れる", ex:"The report touches on several issues.", t:"verb", l:5, exja:"その報告書はいくつかの問題に軽く触れている。"},
+  {en:"delve into", ja:"〜を深く掘り下げる", ex:"The book delves into ancient history.", t:"verb", l:5, exja:"その本は古代史を深く掘り下げている。"},
+  {en:"shed light on", ja:"〜を明らかにする", ex:"The study sheds light on climate change.", t:"verb", l:5, exja:"その研究は気候変動を明らかにしている。"},
+  {en:"bring to light", ja:"〜を明らかにする", ex:"The investigation brought new facts to light.", t:"verb", l:5, exja:"その調査は新たな事実を明るみに出した。"},
+  {en:"come to light", ja:"明らかになる", ex:"New evidence came to light.", t:"verb", l:5, exja:"新たな証拠が明らかになった。"},
+  {en:"call into question", ja:"〜に疑問を投げかける", ex:"The results call the theory into question.", t:"verb", l:5, exja:"その結果はその理論に疑問を投げかけている。"},
+  {en:"take issue with", ja:"〜に異議を唱える", ex:"I take issue with his conclusion.", t:"verb", l:5, exja:"私は彼の結論に異議を唱える。"},
+  {en:"side with", ja:"〜の味方をする", ex:"She sided with her sister in the argument.", t:"verb", l:5, exja:"彼女はその口論で妹の味方をした。"},
+  {en:"weigh in on", ja:"〜について意見を述べる", ex:"Experts weighed in on the debate.", t:"verb", l:5, exja:"専門家たちがその議論について意見を述べた。"},
+  {en:"hinge on", ja:"〜次第である", ex:"Success hinges on careful planning.", t:"verb", l:5, exja:"成功は綿密な計画次第である。"},
+  {en:"boil down to", ja:"結局〜に行き着く", ex:"It all boils down to money.", t:"verb", l:5, exja:"結局のところ、すべてはお金に行き着く。"},
+  {en:"stem from", ja:"〜に由来する", ex:"The problem stems from poor communication.", t:"verb", l:5, exja:"その問題は意思疎通不足に由来する。"},
+  {en:"culminate in", ja:"最終的に〜に至る", ex:"Years of research culminated in a breakthrough.", t:"verb", l:5, exja:"長年の研究が最終的に大きな進展に至った。"},
+  {en:"translate into", ja:"〜につながる、結果として〜になる", ex:"Hard work doesn't always translate into success.", t:"verb", l:5, exja:"努力は必ずしも成功につながるとは限らない。"},
+];
+
+const TYPE_LABEL = {verb:"動詞句", be:"be動詞句", conj:"接続表現", adv:"副詞句"};
+const TYPE_COLOR = {verb:"var(--v-verb)", be:"var(--v-be)", conj:"var(--v-conj)", adv:"var(--v-adv)"};
+const LEVEL_LABEL = {1:"基礎", 2:"標準", 3:"応用", 4:"発展", 5:"最難関"};
+let currentLevel = 'all';
+
+function wordsForLevel(){
+  return currentLevel === 'all' ? WORDS : WORDS.filter(w => w.l === currentLevel);
+}
+
+function renderLevelBar(){
+  const bar = document.getElementById('levelbar');
+  const levels = ['all',1,2,3,4,5];
+  bar.innerHTML = levels.map(lv=>{
+    const label = lv==='all' ? '全レベル' : LEVEL_LABEL[lv];
+    const count = lv==='all' ? WORDS.length : WORDS.filter(w=>w.l===lv).length;
+    const numTag = lv==='all' ? '' : `<span class="n">Lv.${lv}</span>`;
+    return `<button class="lv-btn ${currentLevel===lv?'active':''}" data-lv="${lv}">${numTag}${label}（${count}）</button>`;
+  }).join('');
+  [...bar.children].forEach(btn=>{
+    btn.onclick = ()=>{
+      const v = btn.dataset.lv;
+      currentLevel = v==='all' ? 'all' : Number(v);
+      resetDecks();
+      renderLevelBar();
+      if(mode==='fc') renderFc(); else renderQz();
+    };
+  });
+}
+
+function resetDecks(){
+  fcDeck = shuffle(wordsForLevel()); fcIndex=0; fcKnown=0; fcAgain=0; fcFlipped=false;
+  qzDeck = shuffle(wordsForLevel()); qzIndex=0; qzScore=0; qzChoices=[];
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+document.getElementById('dateTag').textContent = new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric'});
+
+/* ---------- FLASHCARD STATE ---------- */
+let fcDeck = shuffle(wordsForLevel());
+let fcIndex = 0;
+let fcFlipped = false;
+let fcKnown = 0;
+let fcAgain = 0;
+
+/* ---------- QUIZ STATE ---------- */
+let qzDeck = shuffle(wordsForLevel());
+let qzIndex = 0;
+let qzScore = 0;
+let qzAnswered = false;
+let qzChoices = [];
+
+const panel = document.getElementById('panel');
+const tabFc = document.getElementById('tabFc');
+const tabQz = document.getElementById('tabQz');
+let mode = 'fc';
+
+tabFc.onclick = ()=>{ mode='fc'; tabFc.classList.add('active'); tabQz.classList.remove('active'); renderFc(); };
+tabQz.onclick = ()=>{ mode='qz'; tabQz.classList.add('active'); tabFc.classList.remove('active'); renderQz(); };
+
+function renderFc(){
+  if(fcIndex >= fcDeck.length){
+    panel.innerHTML = `
+      <div class="done">
+        <div class="big">${fcKnown} / ${fcDeck.length}</div>
+        <div class="sub">覚えた熟語の数です。もう一周してみましょう。</div>
+        <button class="btn wide" id="restartFc">最初からやり直す</button>
+      </div>`;
+    document.getElementById('restartFc').onclick = ()=>{
+      fcDeck = shuffle(wordsForLevel()); fcIndex=0; fcKnown=0; fcAgain=0; fcFlipped=false; renderFc();
+    };
+    return;
+  }
+  const w = fcDeck[fcIndex];
+  panel.innerHTML = `
+    <div class="fc-scene">
+      <div class="fc-card ${fcFlipped ? 'flipped':''}" id="fcCard">
+        <div class="fc-face front">
+          <span class="cat-tag"><i class="dot" style="background:${TYPE_COLOR[w.t]}"></i>${TYPE_LABEL[w.t]} ・ Lv.${w.l} ${LEVEL_LABEL[w.l]}</span>
+          <div class="fc-en">${w.en}</div>
+          <div class="fc-ex-front">${w.ex}</div>
+          <div class="fc-hint">タップして意味を確認</div>
+        </div>
+        <div class="fc-face back">
+          <span class="cat-tag"><i class="dot" style="background:${TYPE_COLOR[w.t]}"></i>${TYPE_LABEL[w.t]} ・ Lv.${w.l} ${LEVEL_LABEL[w.l]}</span>
+          <div class="fc-ja">${w.ja}</div>
+          <div class="fc-ex">${w.ex}</div>
+          <div class="fc-exja">${w.exja}</div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-controls">
+      <button class="btn again" id="btnAgain">もう一度</button>
+      <button class="btn known" id="btnKnown">覚えた</button>
+    </div>
+    <div class="fc-stats">
+      <span>覚えた: <b>${fcKnown}</b></span>
+      <span>復習: <b>${fcAgain}</b></span>
+    </div>
+  `;
+  document.getElementById('fcCard').onclick = ()=>{ fcFlipped = !fcFlipped; document.getElementById('fcCard').classList.toggle('flipped'); };
+  document.getElementById('btnAgain').onclick = (e)=>{ e.stopPropagation(); fcAgain++; nextFc(); };
+  document.getElementById('btnKnown').onclick = (e)=>{ e.stopPropagation(); fcKnown++; nextFc(); };
+  updateFooter(fcIndex+1, fcDeck.length);
+}
+function nextFc(){ fcIndex++; fcFlipped=false; renderFc(); }
+
+function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function highlightPhrase(ex, phrase){
+  if(phrase.includes('...')) return ex; // "not only ... but also" 等はそのまま表示
+  const re = new RegExp(escapeRegExp(phrase), 'i');
+  if(re.test(ex)) return ex.replace(re, m => `<strong>${m}</strong>`);
+  return ex;
+}
+
+function buildQuizQuestion(){
+  const w = qzDeck[qzIndex];
+  const pool = wordsForLevel();
+  const distractors = shuffle(pool.filter(x=>x.en!==w.en)).slice(0,3);
+  qzChoices = shuffle([w, ...distractors]);
+  qzAnswered = false;
+}
+
+function renderQz(){
+  if(qzIndex >= qzDeck.length){
+    panel.innerHTML = `
+      <div class="done">
+        <div class="big">${qzScore} / ${qzDeck.length}</div>
+        <div class="sub">正解数です。間違えた熟語はフラッシュカードで復習しましょう。</div>
+        <button class="btn wide" id="restartQz">もう一度挑戦する</button>
+      </div>`;
+    document.getElementById('restartQz').onclick = ()=>{
+      qzDeck = shuffle(wordsForLevel()); qzIndex=0; qzScore=0; renderQz();
+    };
+    return;
+  }
+  buildQuizQuestion();
+
+  const w = qzDeck[qzIndex];
+  panel.innerHTML = `
+    <div class="score-strip"><span>正解数: <b>${qzScore}</b></span><span>${TYPE_LABEL[w.t]} ・ Lv.${w.l} ${LEVEL_LABEL[w.l]}</span></div>
+    <div class="q-en">${w.en}</div>
+    <div class="q-ex">${highlightPhrase(w.ex, w.en)}</div>
+    <div class="q-prompt">下線部の意味として正しいものを選んでください</div>
+    <div class="choices" id="choices"></div>
+    <div class="q-feedback" id="feedback"></div>
+  `;
+  const box = document.getElementById('choices');
+  const letters = ['A','B','C','D'];
+  qzChoices.forEach((c, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.innerHTML = `<span class="k">${letters[i]}</span><span>${c.ja}</span>`;
+    btn.onclick = ()=>selectAnswer(c, w, box);
+    box.appendChild(btn);
+  });
+  updateFooter(qzIndex+1, qzDeck.length);
+}
+
+function selectAnswer(chosen, correct, box){
+  if(qzAnswered) return;
+  qzAnswered = true;
+  const isCorrect = chosen.en === correct.en;
+  if(isCorrect) qzScore++;
+  [...box.children].forEach(btn=>{
+    btn.disabled = true;
+    const label = btn.querySelector('span:last-child').textContent;
+    if(label === correct.ja) btn.classList.add('correct');
+    if(label === chosen.ja && !isCorrect) btn.classList.add('wrong');
+  });
+  document.getElementById('feedback').innerHTML = isCorrect
+    ? `正解です。<b style="color:var(--green)">${correct.en}</b> — ${correct.ex}`
+    : `不正解。正しい意味は「<b>${correct.ja}</b>」。 ${correct.ex}`;
+  const next = document.createElement('button');
+  next.className = 'btn wide';
+  next.textContent = qzIndex+1 >= qzDeck.length ? '結果を見る' : '次の問題へ';
+  next.onclick = ()=>{ qzIndex++; renderQz(); };
+  panel.appendChild(next);
+}
+
+function updateFooter(cur, total){
+  let foot = panel.querySelector('.pagefoot');
+  if(!foot){
+    foot = document.createElement('div');
+    foot.className = 'pagefoot';
+    panel.appendChild(foot);
+  }
+  foot.innerHTML = `<span>共通テスト対策 英熟語帳</span><span class="count">${cur} / ${total}</span>`;
+}
+
+renderLevelBar();
+renderFc();
+</script>
+</body>
+</html>
